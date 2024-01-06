@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## 🎯 Building Kimball's Data Warehouse using dbt
 
 - Building a Data Warehouse from scratch
@@ -9,7 +8,4 @@
 ## Resource
 - Raw dataset: [Wide World Importers](https://learn.microsoft.com/en-us/sql/samples/wide-world-importers-what-is?view=sql-server-ver16)
 - Database: [BigQuery](https://cloud.google.com/bigquery)
-- Visualization: Looker Studio
-=======
-# kimball-dbt
->>>>>>> 33036d3 (Initial commit)
+- Visualization: [Looker Studio]()
