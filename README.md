@@ -9,3 +9,15 @@
 - Raw dataset: [Wide World Importers](https://learn.microsoft.com/en-us/sql/samples/wide-world-importers-what-is?view=sql-server-ver16)
 - Database: [BigQuery](https://cloud.google.com/bigquery)
 - Visualization: [Looker Studio]()
+
+
+To serve docs, using command:
+```
+dbt docs generate
+dbt docs serve
+```
+
+To test model, using command:
+```
+dbt test
+```
