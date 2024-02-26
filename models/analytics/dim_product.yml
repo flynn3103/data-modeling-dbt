@@ -1,0 +1,177 @@
+version: 2
+
+models:
+  - name: dim_product
+    columns:
+      - name: product_key
+        tests: 
+          - not_null
+          - unique
+      - name: product_name
+        tests: 
+          - not_null
+      - name: brand_name
+        tests: 
+          - not_null
+      - name: size
+        tests: 
+          - not_null
+      - name: lead_time_days
+        tests: 
+          - not_null
+      - name: quantity_per_outer
+        tests: 
+          - not_null
+      - name: is_chiller_stock
+        tests: 
+          - not_null
+      - name: barcode
+        tests: 
+          - not_null
+      - name: tax_rate
+        tests: 
+          - not_null
+      - name: unit_price
+        tests: 
+          - not_null
+      - name: recommended_retail_price
+        tests: 
+          - not_null
+      - name: typical_weight_per_unit
+        tests: 
+          - not_null
+      - name: tags
+        tests: 
+          - not_null
+      - name: search_details
+        tests: 
+          - not_null
+      - name: unit_package_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('dim_package_type')
+              field: package_type_key
+      - name: unit_package_type_name
+        tests: 
+          - not_null
+      - name: outer_package_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('dim_package_type')
+              field: package_type_key
+      - name: outer_package_type_name
+        tests: 
+          - not_null
+      - name: color_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('stg_dim_color')
+              field: color_key
+      - name: color_name
+        tests: 
+          - not_null
+      - name: supplier_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('dim_supplier')
+              field: supplier_key
+      - name: supplier_name
+        tests: 
+          - not_null
+      - name: supplier_reference
+        tests: 
+          - not_null
+      - name: bank_account_name
+        tests: 
+          - not_null
+      - name: bank_account_branch
+        tests: 
+          - not_null
+      - name: bank_account_code
+        tests: 
+          - not_null
+      - name: bank_account_number
+        tests: 
+          - not_null
+      - name: bank_international_code
+        tests: 
+          - not_null
+      - name: payment_days
+        tests: 
+          - not_null
+      - name: delivery_postal_code
+        tests: 
+          - not_null
+      - name: postal_postal_code
+        tests: 
+          - not_null
+      - name: supplier_category_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('stg_dim_supplier_category')
+              field: supplier_category_key
+      - name: supplier_category_name
+        tests: 
+          - not_null
+      - name: primary_contact_person_key
+        tests: 
+          - not_null
+      - name: alternate_contact_person_key
+        tests: 
+          - not_null
+      - name: delivery_method_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('stg_dim_delivery_method')
+              field: delivery_method_key
+      - name: delivery_method_name
+        tests: 
+          - not_null
+      - name: delivery_city_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('stg_dim_city')
+              field: city_key
+      - name: delivery_city_name
+        tests: 
+          - not_null
+      - name: delivery_state_province_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('stg_dim_city')
+              field: state_province_key
+      - name: delivery_city_state_province_code
+        tests: 
+          - not_null
+      - name: delivery_city_sales_territory
+        tests: 
+          - not_null
+      - name: postal_city_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('stg_dim_city')
+              field: city_key
+      - name: postal_city_name
+        tests: 
+          - not_null
+      - name: postal_city_state_province_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('stg_dim_city')
+              field: state_province_key
+      - name: postal_city_state_province_code
+        tests: 
+          - not_null
+      - name: postal_city_sales_territory
+        tests: 
+          - not_null

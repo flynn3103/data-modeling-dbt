@@ -1,0 +1,119 @@
+version: 2
+
+models:
+  - name: dim_customer
+    columns:
+      - name: customer_key
+        tests: 
+          - not_null
+          - unique
+      - name: customer_name
+        tests: 
+          - not_null
+      - name: credit_limit
+        tests: 
+          - not_null
+      - name: account_opened_date
+        tests: 
+          - not_null:
+              config:
+                where: customer_key <>0
+      - name: standard_discount_percentage
+        tests: 
+          - not_null
+      - name: is_statement_sent
+        tests: 
+          - not_null
+      - name: is_on_credit_hold
+        tests: 
+          - not_null
+      - name: payment_days
+        tests: 
+          - not_null
+      - name: delivery_run
+        tests: 
+          - not_null
+      - name: run_position
+        tests: 
+          - not_null
+      - name: delivery_postal_code
+        tests: 
+          - not_null
+      - name: postal_postal_code
+        tests: 
+          - not_null
+      - name: customer_category_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('stg_dim_customer_category')
+              field: customer_category_key
+      - name: customer_category_name
+        tests: 
+          - not_null
+      - name: buying_group_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('stg_dim_buying_group')
+              field: buying_group_key
+      - name: buying_group_name
+        tests: 
+          - not_null
+      - name: delivery_method_key
+        tests: 
+          - not_null
+      - name: delivery_method_name
+        tests: 
+          - not_null
+      - name: delivery_city_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('stg_delivery_city')
+              field: city_key
+      - name: delivery_city_name
+        tests: 
+          - not_null
+      - name: delivery_state_province_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('stg_delivery_city')
+              field: state_province_key
+      - name: delivery_city_state_province_code
+        tests: 
+          - not_null
+      - name: delivery_city_sales_territory
+        tests: 
+          - not_null
+      - name: postal_city_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('stg_delivery_city')
+              field: city_key
+      - name: postal_city_name
+        tests: 
+          - not_null
+      - name: postal_city_state_province_key
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('stg_delivery_city')
+              field: state_province_key
+      - name: postal_city_state_province_code
+        tests: 
+          - not_null
+      - name: postal_city_sales_territory
+        tests: 
+          - not_null
+      - name: primary_contact_person_key
+        tests: 
+          - not_null
+      - name: alternate_contact_person_key
+        tests: 
+          - not_null
+      - name: bill_to_customer_key
+        tests: 
+          - not_null

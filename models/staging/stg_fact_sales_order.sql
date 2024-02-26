@@ -1,68 +1,89 @@
-WITH fact_sales_order__source AS (
-    SELECT *
-    FROM `vit-lam-data.wide_world_importers.sales__orders`
-)
-
-, fact_sales_order__rename_column AS (
-    SELECT 
-      order_id AS sales_order_key
+WITH 
+  fact_sales_order__source as (
+    SELECT
+      *
+    FROM 
+      `vit-lam-data.wide_world_importers.sales__orders`
+    ),
+  fact_sales_order__rename_column as (
+    SELECT
+      order_id as sales_order_key
       , customer_id as customer_key
-      , picked_by_person_id AS picked_by_person_key
-      , salesperson_person_id AS salesperson_person_key
-      , backorder_order_id AS backorder_order_key
+      , salesperson_person_id as salesperson_person_key
+      , picked_by_person_id as picked_by_person_key
+      , contact_person_id as contact_person_key
+      , backorder_order_id as backorder_order_key
+      , order_date
+      , expected_delivery_date
+      , customer_purchase_order_number
+      , is_undersupply_backordered
+      , picking_completed_when as order_picking_completed_when
+    FROM
+      fact_sales_order__source
+    ),
+  fact_sales_order__cast_type as (
+    SELECT
+      CAST(sales_order_key as INTEGER) as sales_order_key
+      ,CAST(customer_key as INTEGER) as customer_key
+      ,CAST(salesperson_person_key as INTEGER) as salesperson_person_key
+      ,CAST(picked_by_person_key as INTEGER) as picked_by_person_key
+      ,CAST(contact_person_key as INTEGER) as contact_person_key
+      ,CAST(backorder_order_key as INTEGER) as backorder_order_key
+      ,CAST(order_date as Date) as order_date
+      ,CAST(expected_delivery_date as Date) as expected_delivery_date
+      ,CAST(customer_purchase_order_number as Numeric) as customer_purchase_order_number
+      ,CAST(is_undersupply_backordered as BOOLEAN) as is_undersupply_backordered
+      ,CAST(order_picking_completed_when as Date) as order_picking_completed_when
+    FROM
+      fact_sales_order__rename_column
+    ),
+  fact_sales_order__convert_boolean as (
+    SELECT
+        sales_order_key
+      , customer_key
+      , salesperson_person_key
+      , picked_by_person_key
+      , contact_person_key
+      , backorder_order_key
+      , order_date
+      , expected_delivery_date
+      , customer_purchase_order_number
+      , order_picking_completed_when
+      ,CASE 
+      WHEN is_undersupply_backordered is true THEN 'Under Supply Back Ordered'
+      WHEN is_undersupply_backordered is false THEN 'Not Under Supply Back Ordered'
+      END AS is_undersupply_backordered
+    FROM 
+      fact_sales_order__cast_type
+  ),
+  fact_sales_order__handle_null as (
+    SELECT
+      sales_order_key
+      , customer_key
+      , salesperson_person_key
+      , contact_person_key
       , order_date
       , expected_delivery_date
       , is_undersupply_backordered
-    FROM fact_sales_order__source
-)
+      , order_picking_completed_when
+      ,COALESCE(picked_by_person_key,0) as picked_by_person_key
+      ,COALESCE(backorder_order_key,0) as backorder_order_key
+      ,COALESCE(customer_purchase_order_number,0) as customer_purchase_order_number
+    FROM
+      fact_sales_order__convert_boolean
+  )
 
-, fact_sales_order__cast_type AS (
-    SELECT 
-      CAST(sales_order_key AS INTEGER) AS sales_order_key
-      , CAST (customer_key AS INTEGER) AS customer_key
-      , CAST (picked_by_person_key AS INTEGER) AS picked_by_person_key
-      , CAST (salesperson_person_key AS INTEGER) AS salesperson_person_key
-      , CAST (backorder_order_key AS INTEGER) AS backorder_order_key
-      , CAST (order_date AS date) as order_date
-      , CAST (expected_delivery_date AS date) as expected_delivery_date
-      , CAST (is_undersupply_backordered AS BOOLEAN) AS is_undersupply_backordered_boolean
-
-    FROM fact_sales_order__rename_column
-)
-
-, fact_sales_order__convert_boolean AS (
-    SELECT *
-      , CASE 
-        WHEN is_undersupply_backordered_boolean IS TRUE THEN 'Undersupply Backordered'
-        WHEN is_undersupply_backordered_boolean IS FALSE THEN 'Not Undersupply Backordered'
-      ELSE 'Undefined'
-      END AS is_undersupply_backordered
-    
-    FROM fact_sales_order__cast_type
-)
-
-, fact_sales_order__enrich AS (
-SELECT 
-  fact_sales_order.sales_order_key
-  , COALESCE(dim_customer.customer_key, FARM_FINGERPRINT(CONCAT(-1, CAST('2013-01-01' AS DATE)))) AS customer_key
-  , COALESCE(fact_sales_order.picked_by_person_key,0) AS picked_by_person_key
-  , COALESCE(fact_sales_order.salesperson_person_key,0) AS salesperson_person_key
-  , COALESCE(fact_sales_order.backorder_order_key,0) AS backorder_order_key
-  , fact_sales_order.order_date
-  , fact_sales_order.expected_delivery_date
-  , fact_sales_order.is_undersupply_backordered
-FROM fact_sales_order__convert_boolean AS fact_sales_order
-LEFT JOIN {{ref('dim_customer')}}
-  ON dim_customer.customer_key = fact_sales_order.customer_key
-)
-
-SELECT 
+SELECT
   sales_order_key
   , customer_key
-  , picked_by_person_key
   , salesperson_person_key
+  , picked_by_person_key
+  , contact_person_key
   , backorder_order_key
   , order_date
   , expected_delivery_date
+  , customer_purchase_order_number
   , is_undersupply_backordered
-FROM fact_sales_order__enrich
+  , order_picking_completed_when
+FROM
+  fact_sales_order__handle_null

@@ -22,5 +22,3 @@ models:
       - name: delivery_city_key
         tests:
           - not_null
-               
-      
