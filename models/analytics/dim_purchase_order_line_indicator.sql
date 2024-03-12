@@ -1,38 +1,44 @@
 WITH dim_is_order_finalized AS (
   SELECT 
-    'Order is finalized' as is_order_finalized
+    'Order Finalized' AS is_order_finalized
   UNION ALL
   SELECT
-    'Order is not finalized' as is_order_finalized
-),
-  dim_is_order_line_finalized AS (
+    'Not Order Finalized' AS is_order_finalized 
+  UNION ALL
+  SELECT
+    'Undefined' AS is_order_finalized 
+ )
+
+ , dim_is_order_line_finalized AS (
   SELECT 
-    'Order line is finalized' as is_order_line_finalized
+    'Order Line Finalized' AS is_order_line_finalized
   UNION ALL
   SELECT
-    'Order line is not finalized' as is_order_line_finalized
-),
-  dim_is_order_finalized__join as (
+    'Not Order Line Finalized' AS is_order_line_finalized 
+  UNION ALL
   SELECT
-    *
-  FROM 
-    dim_is_order_finalized
-  CROSS JOIN dim_is_order_line_finalized
-  CROSS JOIN {{ ref('dim_package_type') }} AS dim_package_type
-)
+    'Undefined' AS is_order_line_finalized 
+ )
 
 SELECT 
-  is_order_line_finalized
-  ,is_order_finalized
-  ,package_type_key
-  ,package_type_name
-  ,FARM_FINGERPRINT(
-    CONCAT(
-    is_order_line_finalized
-    ,is_order_finalized
-    ,package_type_key
-    )
-    )
-    AS purchase_order_line_indicator_key
-FROM 
-  dim_is_order_finalized__join
+  FARM_FINGERPRINT(
+    CONCAT(package_type_key
+      , ','
+      , delivery_method_key
+      , ','
+      , is_order_line_finalized
+      , ','
+      , is_order_finalized)
+    ) AS purchase_order_line_indicator_key
+    , dim_package_type.package_type_key
+    , dim_package_type.package_type_name
+    , dim_delivery_method.delivery_method_key
+    , dim_delivery_method.delivery_method_name
+    , is_order_line_finalized
+    , is_order_finalized
+
+FROM {{ref('stg_dim_package_type')}} AS dim_package_type
+CROSS JOIN {{ref('stg_dim_delivery_method')}} AS dim_delivery_method
+CROSS JOIN dim_is_order_finalized
+CROSS JOIN dim_is_order_line_finalized
+

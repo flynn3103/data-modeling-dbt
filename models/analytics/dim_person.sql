@@ -1,111 +1,101 @@
-WITH dim_person__source as 
-(
-  SELECT 
-  *
-  FROM 
-  `vit-lam-data.wide_world_importers.application__people`
-),
-  dim_person__rename AS 
-(
-  SELECT
-    person_id AS person_key
-    ,full_name
-    ,preferred_name
-    ,search_name
-    ,is_permitted_to_logon
-    ,logon_name
-    ,is_external_logon_provider
-    ,is_system_user
-    ,is_employee
-    ,is_salesperson
-  FROM
-  dim_person__source
-),
-  dim_person__cast AS
-(
-  SELECT
-    CAST(person_key AS INTEGER) as person_key
-    ,CAST(full_name AS STRING) as full_name
-    ,CAST(preferred_name AS STRING) as preferred_name
-    ,CAST(search_name AS STRING) as search_name
-    ,CAST(is_permitted_to_logon AS BOOLEAN) as is_permitted_to_logon
-    ,CAST(logon_name AS STRING) as logon_name
-    ,CAST(is_external_logon_provider AS BOOLEAN) as is_external_logon_provider
-    ,CAST(is_system_user AS BOOLEAN) as is_system_user
-    ,CAST(is_employee AS BOOLEAN) as is_employee
-    ,CAST(is_salesperson AS BOOLEAN) as is_salesperson
-  FROM
-  dim_person__rename
-),
-  dim_person__convert_boolean AS
-(
-  SELECT
-    person_key
-    ,full_name
-    ,preferred_name
-    ,search_name
-    ,CASE
-        WHEN is_permitted_to_logon is true then 'Permitted to logon'
-        WHEN is_permitted_to_logon is false then 'Not Permitted to logon'
-      END AS is_permitted_to_logon
-    ,logon_name
-    ,CASE
-        WHEN is_external_logon_provider is true then 'External logon provider'
-        WHEN is_external_logon_provider is false then 'Not External logon provider'
-      END AS is_external_logon_provider
-    ,CASE
-        WHEN is_system_user is true then 'System User'
-        WHEN is_system_user is false then 'Not System User'
-      END AS is_system_user
-    ,CASE
-        WHEN is_employee is true then 'Employee'
-        WHEN is_employee is false then 'Not Employee'
-      END AS is_employee
-    ,CASE
-        WHEN is_salesperson is true then 'Sales Person'
-        WHEN is_salesperson is false then 'Not Sales Person'
-      END AS is_salesperson
-  FROM
-    dim_person__cast
-),
-  dim_person__add_undefined_record AS
-(
-  SELECT 
-  person_key
-  ,full_name
-  ,preferred_name
-  ,search_name
-  ,is_permitted_to_logon
-  ,logon_name
-  ,is_external_logon_provider
-  ,is_system_user
-  ,is_employee
-  ,is_salesperson
-  FROM dim_person__convert_boolean
-  UNION ALL
-  SELECT
-  0 as person_key
-  ,'Undefined' as full_name
-  ,'Undefined' as preferred_name
-  ,'Undefined' as search_name
-  ,'Undefined' as is_permitted_to_logon
-  ,'Undefined' as logon_name
-  ,'Undefined' as is_external_logon_provider
-  ,'Undefined' as is_system_user
-  ,'Undefined' as is_employee
-  ,'Undefined' as is_salesperson
-)
 
-SELECT
+WITH dim_person__source AS (
+  SELECT  *
+  FROM `vit-lam-data.wide_world_importers.application__people`
+),
+
+  dim_person__rename AS (
+  SELECT 
+    person_id AS person_key
+    , full_name
+    , search_name
+    , is_system_user
+    , is_employee
+    , is_salesperson    
+    , is_permitted_to_logon
+
+  FROM dim_person__source
+  ),
+
+  dim_person__concast_type AS (
+  SELECT 
+    CAST (person_key AS INTEGER) AS person_key
+    , CAST (full_name AS STRING) AS full_name
+    , CAST(search_name AS STRING) AS search_name
+    , CAST(is_system_user AS BOOLEAN) AS is_system_user_boolean
+    , CAST(is_employee AS BOOLEAN) AS is_employee_boolean
+    , CAST(is_salesperson AS BOOLEAN) AS is_salesperson_boolean
+    , CAST(is_permitted_to_logon AS BOOLEAN) AS is_permitted_to_logon_boolean
+  FROM dim_person__rename
+  ),
+
+  dim_person__convert_boolean AS (
+  SELECT 
+    *
+    , CASE 
+      WHEN is_system_user_boolean IS TRUE THEN 'System User'
+      WHEN is_system_user_boolean IS FALSE THEN 'Not System User'
+    ELSE 'Undefined'
+    END AS is_system_user
+    , CASE 
+      WHEN is_employee_boolean IS TRUE THEN 'Employee'
+      WHEN is_employee_boolean IS FALSE THEN 'Not Employee'
+    ELSE 'Undefined'
+    END AS is_employee
+    , CASE 
+      WHEN is_salesperson_boolean IS TRUE THEN 'Salesperson'
+      WHEN is_salesperson_boolean IS FALSE THEN 'Not Salesperson'
+    ELSE 'Undefined'
+    END AS is_salesperson
+    , CASE 
+      WHEN is_permitted_to_logon_boolean IS TRUE THEN 'Is Permitted To Logon'
+      WHEN is_permitted_to_logon_boolean IS FALSE THEN 'Permitted To Logon'
+    ELSE 'Undefined'
+    END AS is_permitted_to_logon
+    
+  FROM dim_person__concast_type
+
+  ),
+
+  dim_person__add_undefined_record AS (
+  SELECT 
+    person_key
+    , full_name
+    , search_name
+    , is_system_user
+    , is_employee
+    , is_salesperson
+    , is_permitted_to_logon
+  FROM dim_person__convert_boolean
+  
+  UNION ALL
+
+  SELECT 
+    0 AS person_key
+    , 'Undefined' AS full_name
+    , 'Undefined' AS search_name
+    , 'Undefined' AS is_system_user
+    , 'Undefined' AS is_employee
+    , 'Undefined' AS is_salesperson
+    , 'Undefined' AS is_permitted_to_logon
+  UNION ALL
+
+  SELECT 
+    -1 AS person_key
+    , 'Error' AS full_name
+    , 'Error' AS search_name
+    , 'Error' AS is_system_user
+    , 'Error' AS is_employee
+    , 'Error' AS is_salesperson
+    , 'Error' AS is_permitted_to_logon
+  )
+
+SELECT 
   person_key
-  ,full_name
-  ,preferred_name
-  ,search_name
-  ,is_permitted_to_logon
-  ,logon_name
-  ,is_external_logon_provider
-  ,is_system_user
-  ,is_employee
-  ,is_salesperson
-FROM
-  dim_person__add_undefined_record
+  , full_name
+  , search_name
+  , is_system_user
+  , is_employee
+  , is_salesperson
+  , is_permitted_to_logon
+FROM dim_person__add_undefined_record
