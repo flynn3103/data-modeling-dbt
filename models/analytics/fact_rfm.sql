@@ -1,6 +1,7 @@
 WITH fact_rfm__summary AS (
   SELECT 
     COALESCE(dim_customer.customer_key, FARM_FINGERPRINT(CONCAT(-1, CAST('2013-01-01' AS DATE)))) AS customer_key
+    --, fact_sales_order_line.product_key as product_key
     , MAX(fact_sales_order_line.order_date) AS last_active_date
     , DATE_DIFF('2016-06-1', MAX(fact_sales_order_line.order_date), DAY) AS recency -- Since recency is calculated for a point in time and the dataset last order date is May 31 2015, we will set the 1 day after to calculate recency.
     , COUNT (DISTINCT fact_sales_order_line.sales_order_key) AS frequency
