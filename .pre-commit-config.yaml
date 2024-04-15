@@ -1,0 +1,37 @@
+exclude: '^$'
+fail_fast: false
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        name: Check trailing whitespace
+      - id: end-of-file-fixer
+        name: Ensure end of file newline
+
+
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+    - id: black
+      name: Python code formatting
+      types_or: [python, pyi]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.1.1
+    hooks:
+      - id: mypy
+        name: Static type checking
+        additional_dependencies: ["types-freezegun==1.1.6", "boto3-stubs[s3]", "types-PyYAML"]
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        name: Detect secrets
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.257'
+    hooks:
+      - id: ruff
+        name: Linting with ruff
