@@ -1,0 +1,30 @@
+# this yaml is the simplest mode to deploy doris with fe and be.
+# the log and be storage use `EmptyDir` mode as disk. when the pod restart the log and storage will lost.
+# This yaml only for experience deploy and usability on k8s about doris.
+apiVersion: doris.selectdb.com/v1
+kind: DorisCluster
+metadata:
+  labels:
+    name: doriscluster
+    instance: doriscluster-sample
+    part-of: doris-operator
+  name: doriscluster-sample
+spec:
+  feSpec:
+    replicas: 3
+    limits:
+      cpu: 6
+      memory: 12Gi
+    requests:
+      cpu: 6
+      memory: 12Gi
+    image: selectdb/doris.fe-ubuntu:2.0.2
+  beSpec:
+    replicas: 3
+    limits:
+      cpu: 8
+      memory: 16Gi
+    requests:
+      cpu: 8
+      memory: 16Gi
+    image: selectdb/doris.be-ubuntu:2.0.2
