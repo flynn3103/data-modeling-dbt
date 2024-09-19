@@ -1,4 +1,4 @@
-## 🎯 Building Kimball's Data Warehouse using dbt
+## 🎯 Data Modeling and Analytic Engineering
 
 - Building a Data Warehouse from scratch
 - Designing data models following [Kimball's Dimensional Modeling techniques](https://www.goodreads.com/en/book/show/748203)
